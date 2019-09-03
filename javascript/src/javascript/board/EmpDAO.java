@@ -48,8 +48,8 @@ public class EmpDAO {
 
 	public void delEmp(String id) {
 		conn = DAO.getConnect();
-		String sql = "delete * from emp_javascript where emplyee_id = ?";
-
+		String sql = "delete from emp_javascript where employee_id = ?";
+		
 		try {
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
@@ -66,7 +66,6 @@ public class EmpDAO {
 				e.printStackTrace();
 			}
 		}
-
 	}	
 
 	public List<Employee> getEmpList() {
