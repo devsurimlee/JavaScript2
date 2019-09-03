@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+	$(document).ready(
+			function() {
+				$.ajax({
+					url : "Empservlet",
+					dataType : "json",
+					success : function(result) {
+						console.log(result);
+						var $table, $tr, $td;
+						$table = $('<table>').attr('border', '1');
+						var datas = result;
+
+						$tr = $('<tr>').append(
+								$('<th>').text("EmpId"),
+								$('<th>').text("FName"),
+								$('<th>').text("LName"),
+								$('<th>').text("Email"),
+								$('<th>').text("JobId"),
+								$('<th>').text("Salary"),
+								$('<th>').text("HireDate"),
+								$('<td>').html(
+										$('<input>').attr("type", "checkbox")
+												.click(trClick))
+
+						);
+						$table.append($tr);
+
+						$(datas).each(
+								function(ind, val) {
+									$tr = $('<tr>').append(
+											$('<td>').text(val.employeeID),
+											$('<td>').text(val.firstName),
+											$('<td>').text(val.lastName),
+											$('<td>').text(val.email),
+											$('<td>').text(val.jobId),
+											$('<td>').text(val.salary),
+											$('<td>').text(val.hireDate),
+											$('<td>').html(
+													$('<input>').attr("type",
+															"checkbox").click(
+															trClick))
+
+									);
+									$tr.attr('id', val.employeeID); //아이디값은  val.employeeID
+									$table.append($tr);
+								});
+						$('#show').append($table);
+					}
+				});
+
+				$(document).on("click", "tr", function() {
+					console.log($(this).children().eq(0).text());
+					var $id = $(this).children().eq(0).text();
+					$.ajax({
+						//url:"DelServlet?id="+$id, 아래랑 똑같음
+						url : "DelServlet", // DelServlet id?? =$id
+						data : {
+							id : $id
+						}, ///이부분을 가져옴
+						success : function(result) { //에러
+							console.log(result);
+							$('#' + $id).remove();
+
+						}
+					});
+				})
+				//insert Employee
+				$('#insertBtn').on('click', function() {
+					$.ajax({
+						url : "InsertEmp",
+						data: {
+							FName:$('#firstName').val(),
+							LName:$('#lastName').val(),
+							email:$('#email').val(),
+							jobId:$('#jobId').val(),
+							salary:$('#salary').val(),
+							hireDate:$('#hiredate').val(),
+						},
+						
+						success: function(result) {
+							console.log(result);
+
+						}
+					});
+
+				});
+
+			});
+
+	function trClick() {
+		// console.log($(this).parent().parent().attr("id")); //해당 체크박스의 아이디 가져옴
+		//console.log($(this).parent().parent().first-child)); //해당 체크박스의 아이디 가져옴
+		//console.log($(this).parent().parent().childNodes[1]); 
+
+		console.log($(this).children().eq(0).text());
+
+		if ($(this).is(":checked"))
+			$(this).parent().parent().css("background-color", "yellow")
+		else
+			$(this).parent().parent().css("background-color", "white")
+
+	}
+</script>
+
+</head>
+<body>
+	<h3>Input data</h3>
+	FirstName:
+	<input type='text' id='firstName'>
+	<br> LastName:
+	<input type='text' id='lastName'>
+	<br> Email:
+	<input type='text' id='email'>
+	<br> jobId:
+	<input type='text' id='jobId'>
+	<br> Salary:
+	<input type='text' id='salary'>
+	<br> HireDate:
+	<input type='text' id='hiredate'>
+	<button id="insertBtn">Click</button>
+
+
+
+	<h3>Emp LIst</h3>
+	<div id='show'></div>
+
+</body>
+</html>
