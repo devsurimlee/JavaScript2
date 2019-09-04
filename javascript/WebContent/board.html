@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+	$(document).ready(function(){
+		$.ajax({
+			url: "boardServ",
+			dataType: "json",
+			data: {action: 'list'},
+			success: function(result){  ///실시간추가
+				console.log(result);	
+				var $table = $('<table>').attr({'id':'tbl', 'border': '1'}), $tr;
+				$(result).each(function(a, b){
+					console.log(a, b);
+					$tr = $('<tr>').append(
+						$('<td>').text(b.boardNo),
+						$('<td>').text(b.title),
+						$('<td>').text(b.contents),
+						$('<td>').text(b.userId),
+						$('<td>').text(b.createDate),
+						$('<td>').html($('<button>').text('수정').click(changeBtn)),
+						$('<td>').html($('<button>').text('삭제').click(deleteBtn)),
+						$('<td>').html($('<button>').text('덧글').click(commentBtn))
+
+					);
+					$tr.attr({'id':b.boardNo});
+					$table.append($tr);
+				})
+				$('#show').append($table);
+			}			
+		});	
+		
+		
+		$.ajax({
+			url: "boardServ",
+			dataType: "json",
+			data: {action: 'cntList'},
+			success: function(result){  ///실시간추가
+				console.log(result);	
+				var $table = $('<table>').attr({'id':'tbl', 'border': '1'}), $tr;
+				$(result).each(function(a, b){
+					console.log(a, b);
+					$tr = $('<tr>').append(
+						$('<td>').text(b.boardNo),
+						$('<td>').text(b.title),
+						$('<td>').text(b.contents),
+						$('<td>').text(b.userId),
+						$('<td>').text(b.createDate),
+						$('<td>').html($('<button>').text('수정').click(changeBtn)),
+						$('<td>').html($('<button>').text('삭제').click(deleteBtn)),
+						$('<td>').html($('<button>').text('덧글').click(commentBtn))
+
+					);
+					$tr.attr({'id':b.boardNo});
+					$table.append($tr);
+				})
+				$('#show').append($table);
+			}			
+		});	
+		
+		
+			
+		$('#register').on('click', function(){
+			$.ajax({
+				url:"boardServ",
+				data:{
+					action:'insert',
+					title: $('#title').val() ,
+					contents: $('#content').val()
+				},
+				success: function(boardNo){
+					var today = new Date();
+					var $tr = $('<tr>').append(
+						$('<td>').text(boardNo),
+						$('<td>').text($('#title').val()),
+						$('<td>').text($('#content').val()),
+						$('<td>').text('user1'),			
+						$('<td>').text(today),
+						//$('<td>').text(today.format('yyyy-mm-dd hh:mm:ss')),
+						$('<td>').html($('<button>').text('수정').click(changeBtn)),
+						$('<td>').html($('<button>').text('삭제').click(deleteBtn))
+					);
+					$tr.attr({'id':boardNo});
+					$('#tbl').append($tr);
+					$('#title').val("");
+					$('#content').val("");
+					$('#title').focus();
+				}
+			});
+		})// 레지스트 끝
+	});
+	      
+
+	
+
+	function changeBtn(){
+  	  //원래 데이터를 새로운 tr 태그에 값을 담도록 한다  ///수정
+  	  console.log(this);
+  	  var $boardNo = $(this).parent().parent();
+  	  var $tr = $('<tr>').append(
+  			  $('<td>').text($boardNo.children().eq(0).text()), //아이디값
+  			  $('<td>').html($('<input>').attr({'type':'text'}).val($boardNo.children().eq(1).text())),
+  			  $('<td>').html($('<input>').attr({'type':'text'}).val($boardNo.children().eq(2).text())),
+  			  $('<td>').html($('<input>').attr({'type':'text'}).val($boardNo.children().eq(3).text())),
+  			  $('<td>').html($('<input>').attr({'type':'text'}).val($boardNo.children().eq(4).text())),
+  			  $('<td>').html($('<button>').text('변경').click(updateRow)),
+  			  $('<td>').html($('<button>').text('취소').click(deleteRow))
+
+	  
+  	  );
+  	  
+  	  $tr.css("background-color", "yellow"); //수정색상변경
+  	  $boardNo.after($tr);
+  	  $boardNo.css('display', 'none');	//기존텝숨겨줌
+		
+	}
+	
+    function updateRow(){
+    	var $tr = $(this).parent().parent();
+    	$.ajax({
+    		url:"boardServ",
+    		data:{
+    			action:"update",
+    			boardNo: $tr.children().eq(0).text(),
+    			title: $tr.children().eq(1).children().eq(0).val(),  
+    			contents :$tr.children().eq(2).children().eq(0).val()
+    		},
+    		success: function(result){
+    			if(result){
+    				alert("success");
+    				var title = $tr.children().eq(1).children().eq(0).val();
+    				var contents = $tr.children().eq(2).children().eq(0).val();
+    				var boardNo = $tr.children().eq(0).text();
+    				$("#"+boardNo).children().eq(1).text(title);
+    				$("#"+boardNo).children().eq(2).text(contents);
+    				$tr.remove();
+    				$('#'+boardNo).css('display',''); //none값을 지움
+    				
+    				console.log($('#'+boardNo));
+    			}else {
+    				alert("fail");
+    			}			
+    		}
+    	});
+
+    }
+	
+	function deleteBtn(){
+		console.log('delete');
+		var $boardNo = $(this).parent().parent().attr('id');
+		console.log($boardNo);
+		$.ajax({
+			url:"boardServ",
+			data:{action:'delete',
+				boardNo:$boardNo},
+			success:function(){
+				console.log(this);
+				$('#'+$boardNo).remove();
+			}
+		});
+	}
+	
+	//덧글등록
+	function commentBtn(){
+	  	  console.log(this);
+	  	  
+	  	  var $boardNo = $(this).parent().parent();
+	  	  var $tr = $('<tr>').append(
+	  			  $('<td>').text('ㄴ'), //아이디값
+	  			  $('<td>').html($('<input>')),
+	  			  $('<td>').html($('<input>')),
+	  			  $('<td>').html($('<input>')),
+	  			  $('<td>').text(Date),	  			  
+	  			  $('<td>').html($('<button>').text('등록').click(cmtAddBtn)),
+	  			  $('<td>').html($('<button>').text('취소').click(deleteRow))
+	  	  ); 
+	  	  
+	  	  $tr.css("background-color", "skyblue"); //수정색상변경
+	  	  $boardNo.after($tr);		
+	}
+	function cmtAddBtn(){
+		//보드넘버안보이게, 오리진넘버=덧글넘버	
+			$.ajax({
+				url:"boardServ",
+				data:{
+					action:'addCmt',
+					title: $('#title').val() ,
+					contents: $('#content').val()
+				},
+				success: function(boardNo){
+					var today = new Date();
+					var $tr = $('<tr>').append(
+						$('<td>').text(boardNo),
+						$('<td>').text($('#title').val()),
+						$('<td>').text($('#content').val()),
+						$('<td>').text('user1'),			
+						$('<td>').text(today),
+						//$('<td>').text(today.format('yyyy-mm-dd hh:mm:ss')),
+						$('<td>').html($('<button>').text('수정').click(changeBtn)),
+						$('<td>').html($('<button>').text('삭제').click(deleteBtn))
+					);
+					$tr.attr({'id':boardNo});
+					$('#tbl').append($tr);
+					$('#title').val("");
+					$('#content').val("");
+					$('#title').focus();
+				}
+			});
+		
+		
+		
+		
+	}
+	
+	function deleteRow(){
+	  	var $boardNo = $(this).parent().parent();
+	  	console.log($boardNo);	  	
+		$boardNo.remove();
+	}
+
+</script>
+</head>
+<body>
+
+	<form id='frm1'>
+
+		<table>
+			<tr>
+				<td>Tilte: <input type="text" id="title" name="title"></td>
+				<td>Content: <input type="text" id="content" name="content"></td>
+				<td><input type="button" id="register" value="등록"></td>
+			</tr>
+			</tr>
+
+		</table>
+
+
+	</form>
+	<div id='show'></div>
+
+</body>
+</html>

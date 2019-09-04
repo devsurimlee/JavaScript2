@@ -17,10 +17,19 @@ public class EmpDAO {
 	public int insertEmp(Employee emp) {
 		conn = DAO.getConnect();
 		int r = 0;
-		String sql = "insert into emp_javascript (employee_id, first_name, last_name, salary, job_id, email, hire_date)"
-				+ "values((select max(employee_id)+1 from emp_javascript), ?, ?, ?, ?, ?, ?)";
+		int employeeId = 0;
+		String sql1 = "select max(employee_id)+1 emp_id from emp_javascript";
+		
+		String sql = "insert into emp_javascript (first_name, last_name, salary, "
+				+ "email, job_id, hire_date, employee_id) "
+				+ "values(?, ?, ?, ?, ?, ?, ?)";
 		
 		try {
+			pstmt = conn.prepareStatement(sql1);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				employeeId = rs.getInt("emp_id");
+			
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, emp.getFirstName());
 			pstmt.setString(2, emp.getLastName());
@@ -28,8 +37,12 @@ public class EmpDAO {
 			pstmt.setString(4, emp.getJobId());
 			pstmt.setString(5, emp.getEmail());
 			pstmt.setString(6, emp.getHireDate());
+			pstmt.setInt(7, employeeId);
 			
 			r = pstmt.executeUpdate();
+			System.out.println(r + "inserted ==> id:" + employeeId);
+			
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -40,12 +53,10 @@ public class EmpDAO {
 				e.printStackTrace();
 			}
 		}
-		return r;
+		return employeeId;
 	}
 	
 	
-	
-
 	public void delEmp(String id) {
 		conn = DAO.getConnect();
 		String sql = "delete from emp_javascript where employee_id = ?";

@@ -14,7 +14,7 @@
 					success : function(result) {
 						console.log(result);
 						var $table, $tr, $td;
-						$table = $('<table>').attr('border', '1');
+						$table = $('<table>').attr({'id':'tbl', 'border': '1'});
 						var datas = result;
 
 						$tr = $('<tr>').append(
@@ -25,9 +25,8 @@
 								$('<th>').text("JobId"),
 								$('<th>').text("Salary"),
 								$('<th>').text("HireDate"),
-								$('<td>').html(
-										$('<input>').attr("type", "checkbox")
-												.click(trClick))
+								$('<th>').text("Delete")
+										
 
 						);
 						$table.append($tr);
@@ -56,8 +55,8 @@
 				});
 
 				$(document).on("click", "tr", function() {
-					console.log($(this).children().eq(0).text());
-					var $id = $(this).children().eq(0).text();
+ 					console.log($(this).children().eq(0).text());
+					/*var $id = $(this).children().eq(0).text();
 					$.ajax({
 						//url:"DelServlet?id="+$id, 아래랑 똑같음
 						url : "DelServlet", // DelServlet id?? =$id
@@ -69,7 +68,7 @@
 							$('#' + $id).remove();
 
 						}
-					});
+					}); */
 				})
 				//insert Employee
 				$('#insertBtn').on('click', function() {
@@ -82,10 +81,26 @@
 							jobId:$('#jobId').val(),
 							salary:$('#salary').val(),
 							hireDate:$('#hiredate').val(),
+							action: "insert"
 						},
 						
 						success: function(result) {
 							console.log(result);
+							var $tr = $('<tr>').append(
+									$('<td>').text(result),
+									$('<td>').text($('#firstName').val()),
+									$('<td>').text($('#lastName').val()),
+									$('<td>').text($('#email').val()),
+									$('<td>').text($('#jobId').val()),
+									$('<td>').text($('#salary').val()),
+									$('<td>').text($('#hiredate').val()),
+									$('<td>').html(
+											$('<input>').attr("type",
+													"checkbox").click(
+													trClick))
+			
+							);
+							$('#tbl').append($tr)
 
 						}
 					});
@@ -95,17 +110,22 @@
 			});
 
 	function trClick() {
-		// console.log($(this).parent().parent().attr("id")); //해당 체크박스의 아이디 가져옴
+		console.log($(this).parent().parent().attr("id")); //해당 체크박스의 아이디 가져옴
 		//console.log($(this).parent().parent().first-child)); //해당 체크박스의 아이디 가져옴
 		//console.log($(this).parent().parent().childNodes[1]); 
 
-		console.log($(this).children().eq(0).text());
 
-		if ($(this).is(":checked"))
-			$(this).parent().parent().css("background-color", "yellow")
-		else
-			$(this).parent().parent().css("background-color", "white")
+			
+			
+			/* $(this).parent().parent().css("background-color", "yellow")
+			else
+				$(this).parent().parent().css("background-color", "white")
+				
+		}
+			
+			
 
+ */
 	}
 </script>
 
