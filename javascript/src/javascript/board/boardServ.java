@@ -47,7 +47,7 @@ public class boardServ extends HttpServlet {
 			BoardDTO board = new BoardDTO();
 			board.setTitle(title);
 			board.setContents(contents);
-			int boardNo = dao.insertBoard(board); ////덜함
+			int boardNo = dao.insertBoard(board); 
 			out.print(boardNo);
 			
 		} else if(action.equals("delete")) {
@@ -67,12 +67,15 @@ public class boardServ extends HttpServlet {
 			if(cnt > 0)
 				out.print("ok");	
 			
+		}else if(action.equals("insertCmt")) {
+			String title = request.getParameter("title");
+			String contents = request.getParameter("contents");
+			BoardDTO board = new BoardDTO();
+			board.setTitle(title);
+			board.setContents(contents);
+			int boardNo = dao.insertCnt(board); 
+			out.print(boardNo);		
 			
-			//덧글추가
-		} else if(action.equals("cntList")) {
-			
-			List<BoardDTO> cntList = dao.getCntList();
-			out.print(JSONArray.fromObject(cntList).toString()); 
 		}
 		
 	}

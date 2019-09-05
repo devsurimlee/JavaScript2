@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jajvascript.common.DAO;
 
@@ -13,6 +15,71 @@ public class EmpDAO {
 
 	Connection conn = null;
 	PreparedStatement pstmt = null;
+	
+	public Map<String, String> getDeptSal() {
+	      conn = DAO.getConnect();
+	      
+	      String sql = "select first_name, salary from (select * from employees order by salary desc) where rownum <7";      
+	      Map<String, String> map = new HashMap<>();   //util 로 import
+	      String key, value;
+	      try {
+	         pstmt = conn.prepareStatement(sql);
+	         ResultSet rs = pstmt.executeQuery();
+	         while(rs.next()) {
+	            key = rs.getString("first_name");
+	            value = rs.getString("salary");
+	            map.put(key, value);
+	         }
+	      } catch (SQLException e) {
+	         e.printStackTrace();
+	      }finally{
+	         try {
+	            conn.close();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	         
+	      }
+	      return map;
+	      
+	   }
+	
+	
+	
+	
+	
+	public Map<String, String> getDeptPct() {
+	      conn = DAO.getConnect();
+	      
+	      String sql = "SELECT d.department_name, round(count(*)/21*100,2) AS pcnt " + 
+	            "FROM employees e, departments d " + 
+	            "WHERE e.department_id = d.department_id " + 
+	            "and e.department_id IS NOT NULL " + 
+	            "GROUP BY d.department_name";
+	      
+	      Map<String, String> map = new HashMap<>();   //util 로 import
+	      String key, value;
+	      try {
+	         pstmt = conn.prepareStatement(sql);
+	         ResultSet rs = pstmt.executeQuery();
+	         while(rs.next()) {
+	            key = rs.getString("department_name");
+	            value = rs.getString("pcnt");
+	            map.put(key, value);
+	         }
+	      } catch (SQLException e) {
+	         e.printStackTrace();
+	      }finally{
+	         try {
+	            conn.close();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	         
+	      }
+	      return map;
+	      
+	   }
 	
 	public int insertEmp(Employee emp) {
 		conn = DAO.getConnect();

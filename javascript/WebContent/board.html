@@ -8,62 +8,71 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script>
 	$(document).ready(function(){
+		
 		$.ajax({
 			url: "boardServ",
 			dataType: "json",
 			data: {action: 'list'},
 			success: function(result){  ///실시간추가
-				console.log(result);	
+				//console.log(result);	
 				var $table = $('<table>').attr({'id':'tbl', 'border': '1'}), $tr;
-				$(result).each(function(a, b){
-					console.log(a, b);
-					$tr = $('<tr>').append(
-						$('<td>').text(b.boardNo),
-						$('<td>').text(b.title),
-						$('<td>').text(b.contents),
-						$('<td>').text(b.userId),
-						$('<td>').text(b.createDate),
-						$('<td>').html($('<button>').text('수정').click(changeBtn)),
-						$('<td>').html($('<button>').text('삭제').click(deleteBtn)),
-						$('<td>').html($('<button>').text('덧글').click(commentBtn))
+				
+				$tr = $('<tr>').append(
+						$('<th>').text('BoardNo'),
+						$('<th>').text('Title'),
+						$('<th>').text('Contents'),
+						$('<th>').text('UserId'),
+						$('<th>').text('AddTime'),
+						$('<th colspan = "3">').text('Botton'),
 
-					);
+						);		
+				$tr.css('background-color', 'pink');
+				$table.append($tr);
+
+				// origin = null 색상입히고싶음
+				
+				//글목록 가져옴
+				$(result).each(function(a, b){
+					//console.log(a, b);
+					
+					//글목록
+					if(b.originNo == "0"){
+						
+						$tr = $('<tr>').append(
+							$('<td>').text(b.boardNo),
+							$('<td>').text(b.title),
+							$('<td>').text(b.contents),
+							$('<td>').text(b.userId),
+							$('<td>').text(b.createDate),
+							$('<td>').html($('<button>').text('수정').click(changeBtn)),
+							$('<td>').html($('<button>').text('삭제').click(deleteBtn)),
+							$('<td>').html($('<button>').text('덧글').click(commentBtn))
+
+						);
 					$tr.attr({'id':b.boardNo});
 					$table.append($tr);
-				})
-				$('#show').append($table);
-			}			
-		});	
-		
-		
-		$.ajax({
-			url: "boardServ",
-			dataType: "json",
-			data: {action: 'cntList'},
-			success: function(result){  ///실시간추가
-				console.log(result);	
-				var $table = $('<table>').attr({'id':'tbl', 'border': '1'}), $tr;
-				$(result).each(function(a, b){
-					console.log(a, b);
+					$('#show').append($table);
+					
+					//덧글목록
+				} else {
 					$tr = $('<tr>').append(
-						$('<td>').text(b.boardNo),
-						$('<td>').text(b.title),
-						$('<td>').text(b.contents),
-						$('<td>').text(b.userId),
-						$('<td>').text(b.createDate),
-						$('<td>').html($('<button>').text('수정').click(changeBtn)),
-						$('<td>').html($('<button>').text('삭제').click(deleteBtn)),
-						$('<td>').html($('<button>').text('덧글').click(commentBtn))
+							$('<td>').text('▶'),
+							$('<td>').text(b.title),
+							$('<td>').text(b.contents),
+							$('<td>').text(b.userId),
+							$('<td>').text(b.createDate),
+				  			$('<td colspan ="3">').html($('<button>').text('덧글수정').click(commentBtn)),
 
-					);
+						);
 					$tr.attr({'id':b.boardNo});
 					$table.append($tr);
-				})
-				$('#show').append($table);
+					$('#show').append($table);			
+				}
+					
+			 })//each 끝
 			}			
 		});	
-		
-		
+				
 			
 		$('#register').on('click', function(){
 			$.ajax({
@@ -81,9 +90,11 @@
 						$('<td>').text($('#content').val()),
 						$('<td>').text('user1'),			
 						$('<td>').text(today),
-						//$('<td>').text(today.format('yyyy-mm-dd hh:mm:ss')),
+						//$('<td>').text(today.format('yyyy-mm-dd hh:mm:ss')), //라이브러리 없음
 						$('<td>').html($('<button>').text('수정').click(changeBtn)),
-						$('<td>').html($('<button>').text('삭제').click(deleteBtn))
+						$('<td>').html($('<button>').text('삭제').click(deleteBtn)),
+						$('<td>').html($('<button>').text('덧글').click(commentBtn))
+
 					);
 					$tr.attr({'id':boardNo});
 					$('#tbl').append($tr);
@@ -100,7 +111,7 @@
 
 	function changeBtn(){
   	  //원래 데이터를 새로운 tr 태그에 값을 담도록 한다  ///수정
-  	  console.log(this);
+  	  //console.log(this);
   	  var $boardNo = $(this).parent().parent();
   	  var $tr = $('<tr>').append(
   			  $('<td>').text($boardNo.children().eq(0).text()), //아이디값
@@ -141,7 +152,7 @@
     				$tr.remove();
     				$('#'+boardNo).css('display',''); //none값을 지움
     				
-    				console.log($('#'+boardNo));
+    				//console.log($('#'+boardNo));
     			}else {
     				alert("fail");
     			}			
@@ -151,77 +162,74 @@
     }
 	
 	function deleteBtn(){
-		console.log('delete');
 		var $boardNo = $(this).parent().parent().attr('id');
-		console.log($boardNo);
 		$.ajax({
 			url:"boardServ",
 			data:{action:'delete',
 				boardNo:$boardNo},
 			success:function(){
-				console.log(this);
+				//console.log(this);
 				$('#'+$boardNo).remove();
 			}
 		});
 	}
 	
-	//덧글등록
-	function commentBtn(){
-	  	  console.log(this);
-	  	  
+	function deleteRow(){
+	  	var $boardNo = $(this).parent().parent();
+	  	//console.log($boardNo);	  	
+		$boardNo.remove();
+	}
+	
+	//덧글등록하는창
+	function commentBtn(){	  	  
 	  	  var $boardNo = $(this).parent().parent();
 	  	  var $tr = $('<tr>').append(
-	  			  $('<td>').text('ㄴ'), //아이디값
+	  			  $('<td>').text('▶'), //아이디값
 	  			  $('<td>').html($('<input>')),
 	  			  $('<td>').html($('<input>')),
-	  			  $('<td>').html($('<input>')),
+	  			  $('<td>').text('user1'),
 	  			  $('<td>').text(Date),	  			  
-	  			  $('<td>').html($('<button>').text('등록').click(cmtAddBtn)),
+	  			  $('<td>').html($('<button>').text('등록').click(insertCmt)),
 	  			  $('<td>').html($('<button>').text('취소').click(deleteRow))
 	  	  ); 
 	  	  
 	  	  $tr.css("background-color", "skyblue"); //수정색상변경
 	  	  $boardNo.after($tr);		
 	}
-	function cmtAddBtn(){
-		//보드넘버안보이게, 오리진넘버=덧글넘버	
-			$.ajax({
-				url:"boardServ",
-				data:{
-					action:'addCmt',
-					title: $('#title').val() ,
-					contents: $('#content').val()
-				},
-				success: function(boardNo){
-					var today = new Date();
-					var $tr = $('<tr>').append(
-						$('<td>').text(boardNo),
-						$('<td>').text($('#title').val()),
-						$('<td>').text($('#content').val()),
-						$('<td>').text('user1'),			
-						$('<td>').text(today),
-						//$('<td>').text(today.format('yyyy-mm-dd hh:mm:ss')),
-						$('<td>').html($('<button>').text('수정').click(changeBtn)),
-						$('<td>').html($('<button>').text('삭제').click(deleteBtn))
-					);
-					$tr.attr({'id':boardNo});
-					$('#tbl').append($tr);
-					$('#title').val("");
-					$('#content').val("");
-					$('#title').focus();
-				}
-			});
-		
-		
-		
-		
+	
+	//덧글디비입력로직
+	function insertCmt() {	
+    	var $tr = $(this).parent().parent();
+    	console.log($tr.prev().children().eq(0).text()); //prev()앞 next()뒤
+    	
+     	  $.ajax({
+    		url:"boardServ",
+    		data:{
+    			action:"insertCmt",
+    			boardNo: $tr.prev().children().eq(0).text(), // 보드넘버처리
+    			title: $tr.children().eq(1).children().eq(0).val(),  
+    			contents :$tr.children().eq(2).children().eq(0).val()
+    		},
+    		success: function(result){
+    			if(result){
+    				alert("success");
+    				var title = $tr.children().eq(1).children().eq(0).val();
+    				var contents = $tr.children().eq(2).children().eq(0).val();
+    				var boardNo = $tr.prev().children().eq(0).text();
+    				$("#"+boardNo).children().eq(1).text(title);
+    				$("#"+boardNo).children().eq(2).text(contents);
+    				$tr.remove();
+    				$('#'+boardNo).css('display',''); //none값을 지움
+    				
+    				console.log($('#'+boardNo));
+    			}else {
+    				alert("fail");
+    			}			
+    		}
+    	});  
 	}
 	
-	function deleteRow(){
-	  	var $boardNo = $(this).parent().parent();
-	  	console.log($boardNo);	  	
-		$boardNo.remove();
-	}
+
 
 </script>
 </head>

@@ -2,13 +2,18 @@ package javascript.board;
 
 public class BoardDTO {
 	private int boardNo;
+	private int originNo;
 	private String title;
 	private String contents;
 	private String userId;
 	private String createDate;
 	
-	
-
+	public int getOriginNo() {
+		return originNo;
+	}
+	public void setOriginNo(int originNo) {
+		this.originNo = originNo;
+	}
 	public int getBoardNo() {
 		return boardNo;
 	}

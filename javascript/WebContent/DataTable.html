@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+<!-- https://datatables.net/examples/data_sources/ajax.html 참조 -->
+
+
+<script>
+
+$(document).ready(function() {
+    $('#example').DataTable( {
+        "ajax": 'TableServlet'
+    } );
+} );
+
+</script>
+
+</head>
+<body>
+
+<table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>EmployeeId</th>           
+                <th>FirstName</th> 
+                <th>LastName</th>
+                <th>Email</th>
+                <th>Job</th>
+                <th>Salary</th>
+                <th>HireDate</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>EmployeeId</th>                    
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>Job</th>
+                <th>Salary</th>
+                <th>HireDate</th>
+            </tr>
+        </tfoot>
+    </table>
+
+</body>
+</html>
